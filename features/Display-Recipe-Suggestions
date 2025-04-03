@@ -1,0 +1,29 @@
+/**
+ * Displays AI-powered recipe suggestions on the frontend.
+ *
+ * @param string $content The original recipe content.
+ * @return string The modified content with recipe suggestions.
+ */
+function hcdb_display_ai_recipe_suggestions($content) {
+    if (is_singular('recipe')) {
+        $current_recipe_id = get_the_ID();
+        $suggested_recipes = hcdb_get_ai_recipe_suggestions($current_recipe_id);
+
+        if (!empty($suggested_recipes)) {
+            $content .= '<div class="hcdb-ai-suggestions">';
+            $content .= '<h3>' . __('You may also like:', 'homemade-cookbook-database') . '</h3>';
+            $content .= '<ul>';
+
+            foreach ($suggested_recipes as $recipe) {
+                $content .= '<li>';
+                $content .= '<a href="' . get_permalink($recipe->ID) . '">' . get_the_title($recipe->ID) . '</a>';
+                $content .= '</li>';
+            }
+
+            $content .= '</ul>';
+            $content .= '</div>';
+        }
+    }
+    return $content;
+}
+add_filter('the_content', 'hcdb_display_ai_recipe_suggestions');
