@@ -1,0 +1,46 @@
+/**
+ * Generates an HTML file for the selected recipe and prompts the user to download it.
+ */
+function hcdb_export_recipe_as_html() {
+    if (isset($_GET['hcdb_export_html']) && is_singular('recipe')) {
+        // Fetch recipe data
+        $post_id = get_the_ID();
+        $title = get_the_title($post_id);
+        $ingredients = nl2br(get_post_meta($post_id, 'ingredients', true));
+        $instructions = nl2br(get_post_meta($post_id, 'instructions', true));
+
+        // HTML structure
+        $html_content = '<!DOCTYPE html>
+        <html>
+        <head>
+            <title>' . esc_html($title) . '</title>
+        </head>
+        <body>
+            <h1>' . esc_html($title) . '</h1>
+            <h2>Ingredients</h2>
+            <p>' . $ingredients . '</p>
+            <h2>Instructions</h2>
+            <p>' . $instructions . '</p>
+        </body>
+        </html>';
+
+        // Serve the HTML file for download
+        header('Content-Type: text/html');
+        header('Content-Disposition: attachment; filename="' . sanitize_title($title) . '.html"');
+        echo $html_content;
+        exit;
+    }
+}
+add_action('template_redirect', 'hcdb_export_recipe_as_html');
+
+/**
+ * Adds an "Export as HTML" button to recipe pages.
+ */
+function hcdb_add_html_export_button($content) {
+    if (is_singular('recipe')) {
+        $url = add_query_arg('hcdb_export_html', 'true', get_permalink());
+        $content .= '<a href="' . esc_url($url) . '" class="button">' . __('Export as HTML', 'homemade-cookbook-database') . '</a>';
+    }
+    return $content;
+}
+add_filter('the_content', 'hcdb_add_html_export_button');
