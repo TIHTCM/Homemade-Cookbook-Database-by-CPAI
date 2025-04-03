@@ -1,0 +1,37 @@
+/**
+ * Exports plugin data as a JSON file for backup or portability.
+ */
+function hcdb_export_data() {
+    if (isset($_GET['hcdb_export']) && current_user_can('manage_options')) { // Check permissions
+        // Fetch plugin data
+        $recipes = get_posts([
+            'post_type' => 'recipe',
+            'post_status' => 'publish',
+            'numberposts' => -1,
+        ]);
+
+        $data = [];
+        foreach ($recipes as $recipe) {
+            $data[] = [
+                'id' => $recipe->ID,
+                'title' => $recipe->post_title,
+                'content' => $recipe->post_content,
+                'ingredients' => get_post_meta($recipe->ID, 'ingredients', true),
+                'instructions' => get_post_meta($recipe->ID, 'instructions', true),
+                'categories' => wp_get_post_terms($recipe->ID, 'recipe_category', ['fields' => 'names']),
+                'tags' => wp_get_post_terms($recipe->ID, 'recipe_tag', ['fields' => 'names']),
+                'video_url' => get_post_meta($recipe->ID, 'video_url', true),
+            ];
+        }
+
+        // Encode data as JSON
+        $json_data = json_encode($data, JSON_PRETTY_PRINT);
+
+        // Output the JSON file for download
+        header('Content-Type: application/json');
+        header('Content-Disposition: attachment; filename="hcdb-recipes-backup.json"');
+        echo $json_data;
+        exit;
+    }
+}
+add_action('admin_init', 'hcdb_export_data');
