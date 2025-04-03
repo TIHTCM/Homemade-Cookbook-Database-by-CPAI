@@ -1,0 +1,15 @@
+/**
+ * Enqueues the JavaScript file for timer functionality.
+ */
+function hcdb_enqueue_timer_script() {
+    if (is_singular('recipe')) { // Load script only on recipe pages
+        wp_enqueue_script(
+            'hcdb-timer-script',
+            plugin_dir_url(__FILE__) . 'assets/hcdb-timer.js',
+            [],
+            '1.0',
+            true // Load in the footer
+        );
+    }
+}
+add_action('wp_enqueue_scripts', 'hcdb_enqueue_timer_script');
