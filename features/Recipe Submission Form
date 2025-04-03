@@ -1,0 +1,34 @@
+/**
+ * Shortcode: Recipe Submission Form
+ * Usage: [hcdb_recipe_submission_form]
+ * Description: Displays a form for logged-in users to submit recipes.
+ */
+function hcdb_recipe_submission_form_shortcode() {
+    if (!is_user_logged_in()) {
+        return '<p>' . __('You must be logged in to submit a recipe.', 'homemade-cookbook-database') . '</p>';
+    }
+
+    ob_start();
+    ?>
+    <div class="hcdb-recipe-submission-form">
+        <h2><?php _e('Submit Your Recipe', 'homemade-cookbook-database'); ?></h2>
+        <form method="POST" action="">
+            <label for="recipe-title"><?php _e('Recipe Title:', 'homemade-cookbook-database'); ?></label>
+            <input type="text" id="recipe-title" name="recipe_title" required>
+
+            <label for="recipe-description"><?php _e('Description:', 'homemade-cookbook-database'); ?></label>
+            <textarea id="recipe-description" name="recipe_description" rows="5" required></textarea>
+
+            <label for="recipe-ingredients"><?php _e('Ingredients:', 'homemade-cookbook-database'); ?></label>
+            <textarea id="recipe-ingredients" name="recipe_ingredients" rows="5" required></textarea>
+
+            <label for="recipe-instructions"><?php _e('Instructions:', 'homemade-cookbook-database'); ?></label>
+            <textarea id="recipe-instructions" name="recipe_instructions" rows="10" required></textarea>
+
+            <button type="submit" name="submit_recipe" class="button"><?php _e('Submit Recipe', 'homemade-cookbook-database'); ?></button>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('hcdb_recipe_submission_form', 'hcdb_recipe_submission_form_shortcode');
