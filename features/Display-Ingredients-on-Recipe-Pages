@@ -1,0 +1,40 @@
+/**
+ * Displays ingredient nutritional information on recipe pages.
+ *
+ * @param string $content The original recipe content.
+ * @return string The modified content with nutritional info included.
+ */
+function hcdb_display_ingredient_nutrition($content) {
+    if (is_singular('recipe')) {
+        $ingredients_meta = get_post_meta(get_the_ID(), 'ingredients', true);
+
+        if ($ingredients_meta) {
+            $ingredients = explode("\n", $ingredients_meta);
+            $content .= '<div class="hcdb-ingredient-nutrition">';
+            $content .= '<h3>' . __('Ingredient Nutrition Facts', 'homemade-cookbook-database') . '</h3>';
+            $content .= '<ul>';
+
+            foreach ($ingredients as $ingredient) {
+                $data = hcdb_get_ingredient_data($ingredient);
+
+                if ($data) {
+                    $content .= '<li><strong>' . ucfirst($ingredient) . ':</strong> ';
+                    foreach ($data as $key => $value) {
+                        $content .= ucfirst($key) . ': ' . $value . ', ';
+                    }
+                    $content = rtrim($content, ', ') . '</li>';
+                } else {
+                    // Update the database if ingredient data is not found
+                    hcdb_update_ingredient_database($ingredient);
+                    $content .= '<li>' . __('Fetching data for ', 'homemade-cookbook-database') . ucfirst($ingredient) . '...</li>';
+                }
+            }
+
+            $content .= '</ul>';
+            $content .= '</div>';
+        }
+    }
+
+    return $content;
+}
+add_filter('the_content', 'hcdb_display_ingredient_nutrition');
