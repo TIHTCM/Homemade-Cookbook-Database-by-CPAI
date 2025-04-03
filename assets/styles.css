@@ -49,3 +49,43 @@
     font-weight: bold;
     margin-top: 10px;
 }
+
+.hcdb-ai-suggestions {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+.hcdb-ai-suggestions h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.hcdb-ai-suggestions ul {
+    list-style: none;
+    padding: 0;
+}
+
+.hcdb-ai-suggestions li {
+    margin-bottom: 8px;
+}
+
+.hcdb-ingredient-suggestions {
+    margin: 20px 0;
+}
+
+.hcdb-ingredient-suggestions h3 {
+    font-size: 18px;
+    color: #333;
+}
+
+.hcdb-ingredient-results ul {
+    list-style: none;
+    padding: 0;
+}
+
+.hcdb-ingredient-results li {
+    margin-bottom: 10px;
+}
