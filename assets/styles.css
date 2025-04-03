@@ -28,3 +28,24 @@
     margin-bottom: 8px;
     font-size: 14px;
 }
+
+.hcdb-recipe-timer {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.hcdb-recipe-timer h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+#hcdb-timer-display {
+    font-size: 16px;
+    color: #222;
+    font-weight: bold;
+    margin-top: 10px;
+}
