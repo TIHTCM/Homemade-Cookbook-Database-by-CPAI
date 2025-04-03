@@ -1,0 +1,21 @@
+/**
+ * Displays a timer on recipe pages.
+ *
+ * @param string $content The original recipe content.
+ * @return string The modified content with the timer included.
+ */
+function hcdb_add_timer_to_recipe($content) {
+    if (is_singular('recipe')) { // Only display on individual recipe pages
+        $timer_html = '<div class="hcdb-recipe-timer">';
+        $timer_html .= '<h3>' . __('Cooking Timer', 'homemade-cookbook-database') . '</h3>';
+        $timer_html .= '<label for="hcdb-timer-input">' . __('Set Timer (minutes):', 'homemade-cookbook-database') . '</label>';
+        $timer_html .= '<input type="number" id="hcdb-timer-input" name="hcdb_timer_input" min="1" max="999">';
+        $timer_html .= '<button id="hcdb-start-timer" class="button">' . __('Start Timer', 'homemade-cookbook-database') . '</button>';
+        $timer_html .= '<div id="hcdb-timer-display" style="margin-top: 10px;"></div>';
+        $timer_html .= '</div>';
+
+        $content .= $timer_html; // Append the timer HTML to the content
+    }
+    return $content;
+}
+add_filter('the_content', 'hcdb_add_timer_to_recipe');
