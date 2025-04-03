@@ -1,0 +1,25 @@
+/**
+ * Adds an export button to the admin menu.
+ */
+function hcdb_add_export_button() {
+    ?>
+    <div class="wrap">
+        <h1><?php _e('Export Plugin Data', 'homemade-cookbook-database'); ?></h1>
+        <p><?php _e('Click the button below to export all recipe data as a JSON file for backup or portability.', 'homemade-cookbook-database'); ?></p>
+        <a href="<?php echo esc_url(admin_url('admin.php?hcdb_export=true')); ?>" class="button button-primary">
+            <?php _e('Export Data', 'homemade-cookbook-database'); ?>
+        </a>
+    </div>
+    <?php
+}
+add_action('admin_menu', function() {
+    add_menu_page(
+        __('Export Plugin Data', 'homemade-cookbook-database'),
+        __('Export Data', 'homemade-cookbook-database'),
+        'manage_options',
+        'hcdb-export-data',
+        'hcdb_add_export_button',
+        'dashicons-download',
+        80
+    );
+});
