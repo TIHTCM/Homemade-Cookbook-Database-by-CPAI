@@ -1,0 +1,43 @@
+/**
+ * Processes ingredient-based recipe suggestions.
+ */
+function hcdb_process_ingredient_suggestions() {
+    if (isset($_POST['find_recipes']) && !empty($_POST['ingredients'])) {
+        $input_ingredients = explode(',', sanitize_text_field($_POST['ingredients']));
+        $input_ingredients = array_map('trim', array_map('strtolower', $input_ingredients));
+
+        $recipes = get_posts([
+            'post_type' => 'recipe',
+            'post_status' => 'publish',
+            'numberposts' => -1,
+        ]);
+
+        $suggested_recipes = [];
+
+        foreach ($recipes as $recipe) {
+            $recipe_ingredients = get_post_meta($recipe->ID, 'ingredients', true);
+            $recipe_ingredients = explode("\n", strtolower($recipe_ingredients));
+
+            if (array_intersect($input_ingredients, $recipe_ingredients)) {
+                $suggested_recipes[] = $recipe;
+            }
+        }
+
+        // Display suggestions
+        if (!empty($suggested_recipes)) {
+            echo '<div class="hcdb-ingredient-results">';
+            echo '<h3>' . __('Recipe Suggestions:', 'homemade-cookbook-database') . '</h3>';
+            echo '<ul>';
+
+            foreach ($suggested_recipes as $recipe) {
+                echo '<li><a href="' . get_permalink($recipe->ID) . '">' . get_the_title($recipe->ID) . '</a></li>';
+            }
+
+            echo '</ul>';
+            echo '</div>';
+        } else {
+            echo '<p>' . __('No recipes found for the entered ingredients.', 'homemade-cookbook-database') . '</p>';
+        }
+    }
+}
+add_action('init', 'hcdb_process_ingredient_suggestions');
