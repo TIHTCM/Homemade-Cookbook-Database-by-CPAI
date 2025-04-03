@@ -1,0 +1,42 @@
+/**
+ * Updates the ingredient database from an external API.
+ *
+ * @param string $ingredient The ingredient name to fetch data for.
+ */
+function hcdb_update_ingredient_database($ingredient) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'hcdb_ingredients';
+
+    // Check if ingredient already exists and is up to date
+    $existing_ingredient = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM $table_name WHERE name = %s",
+        strtolower($ingredient)
+    ));
+
+    if ($existing_ingredient && strtotime($existing_ingredient->updated_at) > strtotime('-7 days')) {
+        // Use existing data if it's updated within the last 7 days
+        return json_decode($existing_ingredient->nutrients, true);
+    }
+
+    // Fetch data from an external API
+    $api_url = "https://api.edamam.com/api/food-database/v2/parser?ingr=" . urlencode($ingredient) . "&app_id=YOUR_APP_ID&app_key=YOUR_APP_KEY";
+    $response = wp_remote_get($api_url);
+
+    if (is_wp_error($response)) {
+        return null; // Return null if the API call fails
+    }
+
+    $data = json_decode(wp_remote_retrieve_body($response), true);
+
+    // Extract nutrient information (modify based on API response structure)
+    $nutrients = $data['parsed'][0]['food']['nutrients'] ?? [];
+
+    // Store or update ingredient data in the database
+    $wpdb->replace($table_name, [
+        'name' => strtolower($ingredient),
+        'nutrients' => json_encode($nutrients),
+        'updated_at' => current_time('mysql'),
+    ]);
+
+    return $nutrients;
+}
