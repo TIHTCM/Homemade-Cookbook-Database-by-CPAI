@@ -1,0 +1,17 @@
+/**
+ * Retrieves ingredient data from the local database.
+ *
+ * @param string $ingredient The ingredient name.
+ * @return array|null The ingredient data, or null if not found.
+ */
+function hcdb_get_ingredient_data($ingredient) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'hcdb_ingredients';
+
+    $ingredient_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM $table_name WHERE name = %s",
+        strtolower($ingredient)
+    ));
+
+    return $ingredient_data ? json_decode($ingredient_data->nutrients, true) : null;
+}
