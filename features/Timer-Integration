@@ -1,0 +1,19 @@
+/**
+ * Shortcode: Cooking Timer
+ * Usage: [hcdb_timer]
+ * Description: Adds a cooking timer to recipe pages.
+ */
+function hcdb_timer_shortcode() {
+    ob_start();
+    ?>
+    <div class="hcdb-recipe-timer">
+        <h3><?php _e('Cooking Timer', 'homemade-cookbook-database'); ?></h3>
+        <label for="hcdb-timer-input"><?php _e('Set Timer (minutes):', 'homemade-cookbook-database'); ?></label>
+        <input type="number" id="hcdb-timer-input" name="hcdb_timer_input" min="1" max="999">
+        <button id="hcdb-start-timer" class="button"><?php _e('Start Timer', 'homemade-cookbook-database'); ?></button>
+        <div id="hcdb-timer-display" style="margin-top: 10px;"></div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('hcdb_timer', 'hcdb_timer_shortcode');
