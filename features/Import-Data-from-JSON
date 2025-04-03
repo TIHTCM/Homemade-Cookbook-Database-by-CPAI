@@ -1,0 +1,71 @@
+/**
+ * Displays a form to upload and import a JSON file.
+ */
+function hcdb_import_data_form() {
+    if (current_user_can('manage_options')) {
+        ?>
+        <div class="wrap">
+            <h1><?php _e('Import Plugin Data', 'homemade-cookbook-database'); ?></h1>
+            <p><?php _e('Upload a JSON file to restore recipe data.', 'homemade-cookbook-database'); ?></p>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="hcdb_import_file" accept=".json" required>
+                <button type="submit" name="hcdb_import_data" class="button button-primary">
+                    <?php _e('Import Data', 'homemade-cookbook-database'); ?>
+                </button>
+            </form>
+        </div>
+        <?php
+    }
+}
+add_action('admin_menu', function() {
+    add_submenu_page(
+        'hcdb-export-data',
+        __('Import Plugin Data', 'homemade-cookbook-database'),
+        __('Import Data', 'homemade-cookbook-database'),
+        'manage_options',
+        'hcdb-import-data',
+        'hcdb_import_data_form'
+    );
+});
+
+/**
+ * Handles JSON file uploads and restores plugin data.
+ */
+function hcdb_process_import_data() {
+    if (isset($_POST['hcdb_import_data']) && !empty($_FILES['hcdb_import_file'])) {
+        $file = $_FILES['hcdb_import_file'];
+
+        // Validate JSON file
+        if ($file['type'] === 'application/json') {
+            $json_data = file_get_contents($file['tmp_name']);
+            $data = json_decode($json_data, true);
+
+            if ($data) {
+                foreach ($data as $recipe) {
+                    // Restore recipe posts and metadata
+                    $post_id = wp_insert_post([
+                        'post_type' => 'recipe',
+                        'post_title' => $recipe['title'],
+                        'post_content' => $recipe['content'],
+                        'post_status' => 'publish',
+                    ]);
+
+                    if ($post_id) {
+                        update_post_meta($post_id, 'ingredients', $recipe['ingredients']);
+                        update_post_meta($post_id, 'instructions', $recipe['instructions']);
+                        update_post_meta($post_id, 'video_url', $recipe['video_url']);
+                        wp_set_post_terms($post_id, $recipe['categories'], 'recipe_category');
+                        wp_set_post_terms($post_id, $recipe['tags'], 'recipe_tag');
+                    }
+                }
+
+                echo '<p>' . __('Data imported successfully!', 'homemade-cookbook-database') . '</p>';
+            } else {
+                echo '<p>' . __('Invalid JSON data.', 'homemade-cookbook-database') . '</p>';
+            }
+        } else {
+            echo '<p>' . __('Please upload a valid JSON file.', 'homemade-cookbook-database') . '</p>';
+        }
+    }
+}
+add_action('admin_init', 'hcdb_process_import_data');
