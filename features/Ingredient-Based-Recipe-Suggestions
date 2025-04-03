@@ -1,0 +1,20 @@
+/**
+ * Shortcode: Ingredient-Based Recipe Suggestions
+ * Usage: [hcdb_ingredient_suggestions]
+ * Description: Displays a form for users to find recipes by ingredients.
+ */
+function hcdb_ingredient_suggestions_shortcode() {
+    ob_start();
+    ?>
+    <div class="hcdb-ingredient-suggestions">
+        <h3><?php _e('Find Recipes by Ingredients', 'homemade-cookbook-database'); ?></h3>
+        <form method="POST" action="">
+            <label for="ingredients"><?php _e('Enter ingredients (comma-separated):', 'homemade-cookbook-database'); ?></label>
+            <input type="text" id="ingredients" name="ingredients" required>
+            <button type="submit" name="find_recipes" class="button"><?php _e('Find Recipes', 'homemade-cookbook-database'); ?></button>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('hcdb_ingredient_suggestions', 'hcdb_ingredient_suggestions_shortcode');
