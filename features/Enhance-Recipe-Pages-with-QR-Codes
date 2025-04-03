@@ -1,0 +1,19 @@
+/**
+ * Displays a QR code linking to the recipe API.
+ *
+ * @param string $content The original recipe content.
+ * @return string The modified content with a QR code included.
+ */
+function hcdb_add_qr_code_to_recipe($content) {
+    if (is_singular('recipe')) {
+        $api_url = rest_url('hcdb/v1/recipes/' . get_the_ID());
+        $qr_code_url = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($api_url);
+
+        $content .= '<div class="hcdb-qr-code">';
+        $content .= '<h3>' . __('Scan to Access Recipe on Smart Device', 'homemade-cookbook-database') . '</h3>';
+        $content .= '<img src="' . esc_url($qr_code_url) . '" alt="' . __('QR Code', 'homemade-cookbook-database') . '">';
+        $content .= '</div>';
+    }
+    return $content;
+}
+add_filter('the_content', 'hcdb_add_qr_code_to_recipe');
