@@ -1,0 +1,44 @@
+/**
+ * Generates a PDF file for the selected recipe and prompts the user to download it.
+ */
+function hcdb_export_recipe_as_pdf() {
+    if (isset($_GET['hcdb_export_pdf']) && is_singular('recipe')) {
+        require_once plugin_dir_path(__FILE__) . 'lib/dompdf/autoload.inc.php';
+
+        // Fetch recipe data
+        $post_id = get_the_ID();
+        $title = get_the_title($post_id);
+        $ingredients = nl2br(get_post_meta($post_id, 'ingredients', true));
+        $instructions = nl2br(get_post_meta($post_id, 'instructions', true));
+
+        // PDF content structure
+        $pdf_content = '<h1>' . esc_html($title) . '</h1>
+        <h2>Ingredients</h2>
+        <p>' . $ingredients . '</p>
+        <h2>Instructions</h2>
+        <p>' . $instructions . '</p>';
+
+        // Dompdf instance
+        $dompdf = new Dompdf\Dompdf();
+        $dompdf->loadHtml($pdf_content);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Serve the PDF for download
+        $dompdf->stream(sanitize_title($title) . '.pdf', ['Attachment' => true]);
+        exit;
+    }
+}
+add_action('template_redirect', 'hcdb_export_recipe_as_pdf');
+
+/**
+ * Adds an "Export as PDF" button to recipe pages.
+ */
+function hcdb_add_pdf_export_button($content) {
+    if (is_singular('recipe')) {
+        $url = add_query_arg('hcdb_export_pdf', 'true', get_permalink());
+        $content .= '<a href="' . esc_url($url) . '" class="button">' . __('Export as PDF', 'homemade-cookbook-database') . '</a>';
+    }
+    return $content;
+}
+add_filter('the_content', 'hcdb_add_pdf_export_button');
