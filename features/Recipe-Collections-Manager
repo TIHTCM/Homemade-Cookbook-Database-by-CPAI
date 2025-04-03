@@ -1,0 +1,44 @@
+/**
+ * Shortcode: Recipe Collections Manager
+ * Usage: [hcdb_recipe_collections]
+ * Description: Displays and allows users to manage their recipe collections.
+ */
+function hcdb_recipe_collections_shortcode() {
+    if (!is_user_logged_in()) {
+        return '<p>' . __('You must be logged in to manage your recipe collections.', 'homemade-cookbook-database') . '</p>';
+    }
+
+    $user_id = get_current_user_id();
+    $collections = get_user_meta($user_id, 'hcdb_recipe_collections', true);
+    $collections = $collections ?: [];
+
+    ob_start();
+    ?>
+    <div class="hcdb-recipe-collections">
+        <h2><?php _e('My Recipe Collections', 'homemade-cookbook-database'); ?></h2>
+
+        <form method="POST" action="">
+            <label for="new-collection-name"><?php _e('Create a New Collection:', 'homemade-cookbook-database'); ?></label>
+            <input type="text" id="new-collection-name" name="new_collection_name" required>
+            <button type="submit" name="create_collection" class="button"><?php _e('Create Collection', 'homemade-cookbook-database'); ?></button>
+        </form>
+
+        <?php if (!empty($collections)): ?>
+            <ul>
+                <?php foreach ($collections as $name => $recipes): ?>
+                    <li>
+                        <strong><?php echo esc_html($name); ?></strong> (<?php echo count($recipes); ?> recipes)
+                        <a href="<?php echo esc_url(add_query_arg('view_collection', $name)); ?>">
+                            <?php _e('View', 'homemade-cookbook-database'); ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p><?php _e('You have no collections yet.', 'homemade-cookbook-database'); ?></p>
+        <?php endif; ?>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('hcdb_recipe_collections', 'hcdb_recipe_collections_shortcode');
